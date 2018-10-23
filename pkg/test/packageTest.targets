@@ -88,13 +88,13 @@
   </Target>
 
   <PropertyGroup>
-    <TestDependsOn>
+    <_testDependsOn>
       LogBeginTest;
       VerifyReferenceClosure;
       VerifyReferenceTypes;
       VerifyRuntimeClosure;
       VerifyRuntimeTypes;
-    </TestDependsOn>
+    </_testDependsOn>
   </PropertyGroup>
   
   <!-- inner target to be called by outer Test Target -->
