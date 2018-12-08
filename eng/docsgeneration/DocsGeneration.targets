@@ -1,0 +1,102 @@
+<Project Sdk="Microsoft.NET.Sdk" InitialTargets="_removeImplicitReferences">
+    <PropertyGroup>
+      <TargetFramework Condition="'$(TargetFramework)' == ''">netcoreapp3.0</TargetFramework>
+
+      <NetcoreappRefDir>$(ArtifactsBinDir)\ref\netcoreapp\</NetcoreappRefDir>
+      <InboxRefsDir>$(ArtifactsBinDir)\ref\microsoft.netcore.app\</InboxRefsDir>
+      <DocsLayoutRoot>$(ArtifactsDir)\docslayout\</DocsLayoutRoot>
+      <OobLayoutDir>$(DocsLayoutRoot)extensions\</OobLayoutDir>
+      <InboxLayoutDir>$(DocsLayoutRoot)microsoft.netcore.app\</InboxLayoutDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <Exclusions Include="$(NetcoreappRefDir)dotnet-*.dll" />
+      <Exclusions Include="$(NetcoreappRefDir)CoreFX*.dll" />
+      <Exclusions Include="$(NetcoreappRefDir)System.Net.Http.Rtc.dll" />
+
+      <NetcoreappRefs Include="$(NetcoreappRefDir)*.dll" Exclude="@(Exclusions)" />
+      <InboxRefs Include="$(InboxRefsDir)*.dll" />
+
+      <_frameworkPackages Include="Microsoft.WindowsDesktop.App" Version="3.0.0-preview-27325-3" />
+
+      <!-- External assemblies we represent as part of the framework. I.e, The Microsoft.Windows.Compatibility
+      package depends on WCF and we layout those as part of the Platform Extensions or OOB packages we don't built
+      anymore in this branch -->
+      <_externalPackages Include="System.ServiceModel.Duplex" Version="4.5.3" />
+      <_externalPackages Include="System.ServiceModel.Http" Version="4.5.3" />
+      <_externalPackages Include="System.ServiceModel.NetTcp" Version="4.5.3" />
+      <_externalPackages Include="System.ServiceModel.Primitives" Version="4.5.3" />
+      <_externalPackages Include="System.ServiceModel.Security" Version="4.5.3" />
+
+      <PackageReference Include="@(_frameworkPackages);@(_externalPackages)" />
+    </ItemGroup>
+
+    <Target Name="_removeImplicitReferences">
+      <ItemGroup>
+        <!-- Remove all implicit framework packages, we only want the above package references -->
+        <PackageReference Remove="@(PackageReference)" Condition="'%(PackageReference.IsImplicitlyDefined)' == 'true'" />
+        <FrameworkReference Remove="@(FrameworkReference)" Condition="'%(FrameworkReference.IsImplicitlyDefined)' == 'true'" />
+      </ItemGroup>
+    </Target>
+
+    <Target Name="_copyExternalOobAssemblies" DependsOnTargets="Restore;ResolveReferences">
+      <PropertyGroup>
+        <_externalPackagesProperty>@(_externalPackages)</_externalPackagesProperty>
+      </PropertyGroup>
+      <ItemGroup>
+       <_externalReferencePath Include="@(ReferencePath)" Condition="$(_externalPackagesProperty.Contains('%(ReferencePath.NugetPackageId)'))" />
+      </ItemGroup>
+
+      <Copy
+        SourceFiles="@(_externalReferencePath)"
+        DestinationFolder="$(OobLayoutDir)"
+        OverwriteReadOnlyFiles="false" />
+    </Target>
+
+    <Target Name="_copyExternalFrameworkAssemblies" DependsOnTargets="_copyExternalOobAssemblies">
+      <PropertyGroup>
+       <_frameworkPackagesProperty>@(_frameworkPackages)</_frameworkPackagesProperty>
+      </PropertyGroup>
+
+      <ItemGroup>
+        <_referencePathToFileName Include="@(ReferencePath -> '%(FileName)')"  Condition="$(_frameworkPackagesProperty.Contains('%(ReferencePath.NugetPackageId)'))">
+          <OriginalIdentity>%(Identity)</OriginalIdentity>
+        </_referencePathToFileName>
+
+        <_allNetcoreAssemblies Include="$(InboxLayoutDir)\*.dll;$(OobLayoutDir)\*.dll" />
+
+        <_referencePathToFileName Remove="@(_allNetcoreAssemblies -> '%(FileName)')" />
+      </ItemGroup>
+
+      <Copy
+        SourceFiles="@(_referencePathToFileName -> '%(OriginalIdentity)')"
+        DestinationFolder="$(InboxLayoutDir)"
+        OverwriteReadOnlyFiles="false" />
+    </Target>
+
+    <Target Name="_createOobLayout">
+      <ItemGroup>
+        <_netcoreappRefsToFileName Include="@(NetcoreappRefs -> '%(FileName)')">
+          <OriginalIdentity>%(Identity)</OriginalIdentity>
+        </_netcoreappRefsToFileName>
+
+        <!-- Remove inbox references from full set of built netcoreapp refs to get OOB layout -->
+        <_netcoreappRefsToFileName Remove="@(InboxRefs -> '%(FileName)')" />
+      </ItemGroup>
+
+      <MakeDir Directories="$(OobLayoutDir)" />
+      <Copy
+        SourceFiles="@(_netcoreappRefsToFileName -> '%(OriginalIdentity)')"
+        DestinationFolder="$(OobLayoutDir)" 
+        OverwriteReadOnlyFiles="true" />
+    </Target>
+
+    <Target Name="_createInboxLayout">
+      <MakeDir Directories="$(InboxLayoutDir)" />
+      <Copy
+        SourceFiles="@(InboxRefs)"
+        DestinationFolder="$(InboxLayoutDir)"
+        OverwriteReadOnlyFiles="true" />
+    </Target>
+
+    <Target Name="GenerateDocsLayout" DependsOnTargets="_createOobLayout;_createInboxLayout;_copyExternalFrameworkAssemblies" />
+</Project>
