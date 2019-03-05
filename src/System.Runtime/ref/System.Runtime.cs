@@ -4,7 +4,7 @@
 // ------------------------------------------------------------------------------
 // Changes to this file must follow the http://aka.ms/api-review process.
 // ------------------------------------------------------------------------------
-
+#pragma warning disable nullable
 namespace Microsoft.Win32.SafeHandles
 {
     public abstract partial class CriticalHandleMinusOneIsInvalid : System.Runtime.InteropServices.CriticalHandle
@@ -2288,6 +2288,7 @@ namespace System
     {
         public STAThreadAttribute() { }
     }
+#pragma warning enable nullable
     public sealed partial class String : System.Collections.Generic.IEnumerable<char>, System.Collections.IEnumerable, System.ICloneable, System.IComparable, System.IComparable<string>, System.IConvertible, System.IEquatable<string>
     {
         public static readonly string Empty;
@@ -2315,29 +2316,29 @@ namespace System
         public object Clone() { throw null; }
         public static int Compare(System.String strA, int indexA, System.String strB, int indexB, int length) { throw null; }
         public static int Compare(System.String strA, int indexA, System.String strB, int indexB, int length, bool ignoreCase) { throw null; }
-        public static int Compare(System.String strA, int indexA, System.String strB, int indexB, int length, bool ignoreCase, System.Globalization.CultureInfo culture) { throw null; }
-        public static int Compare(System.String strA, int indexA, System.String strB, int indexB, int length, System.Globalization.CultureInfo culture, System.Globalization.CompareOptions options) { throw null; }
+        public static int Compare(System.String? strA, int indexA, System.String? strB, int indexB, int length, bool ignoreCase, System.Globalization.CultureInfo culture) { throw null; }
+        public static int Compare(System.String? strA, int indexA, System.String? strB, int indexB, int length, System.Globalization.CultureInfo culture, System.Globalization.CompareOptions options) { throw null; }
         public static int Compare(System.String strA, int indexA, System.String strB, int indexB, int length, System.StringComparison comparisonType) { throw null; }
-        public static int Compare(System.String strA, System.String strB) { throw null; }
-        public static int Compare(System.String strA, System.String strB, bool ignoreCase) { throw null; }
-        public static int Compare(System.String strA, System.String strB, bool ignoreCase, System.Globalization.CultureInfo culture) { throw null; }
-        public static int Compare(System.String strA, System.String strB, System.Globalization.CultureInfo culture, System.Globalization.CompareOptions options) { throw null; }
-        public static int Compare(System.String strA, System.String strB, System.StringComparison comparisonType) { throw null; }
+        public static int Compare(System.String? strA, System.String? strB) { throw null; }
+        public static int Compare(System.String? strA, System.String? strB, bool ignoreCase) { throw null; }
+        public static int Compare(System.String? strA, System.String? strB, bool ignoreCase, System.Globalization.CultureInfo culture) { throw null; }
+        public static int Compare(System.String? strA, System.String? strB, System.Globalization.CultureInfo culture, System.Globalization.CompareOptions options) { throw null; }
+        public static int Compare(System.String? strA, System.String? strB, System.StringComparison comparisonType) { throw null; }
         public static int CompareOrdinal(System.String strA, int indexA, System.String strB, int indexB, int length) { throw null; }
-        public static int CompareOrdinal(System.String strA, System.String strB) { throw null; }
+        public static int CompareOrdinal(System.String? strA, System.String? strB) { throw null; }
         public int CompareTo(object value) { throw null; }
         public int CompareTo(System.String strB) { throw null; }
         public static System.String Concat(System.Collections.Generic.IEnumerable<string> values) { throw null; }
-        public static System.String Concat(object arg0) { throw null; }
-        public static System.String Concat(object arg0, object arg1) { throw null; }
-        public static System.String Concat(object arg0, object arg1, object arg2) { throw null; }
+        public static System.String Concat(object? arg0) { throw null; }
+        public static System.String Concat(object? arg0, object? arg1) { throw null; }
+        public static System.String Concat(object? arg0, object? arg1, object? arg2) { throw null; }
         public static System.String Concat(params object[] args) { throw null; }
         public static System.String Concat(System.ReadOnlySpan<char> str0, System.ReadOnlySpan<char> str1) { throw null; }
         public static System.String Concat(System.ReadOnlySpan<char> str0, System.ReadOnlySpan<char> str1, System.ReadOnlySpan<char> str2) { throw null; }
         public static System.String Concat(System.ReadOnlySpan<char> str0, System.ReadOnlySpan<char> str1, System.ReadOnlySpan<char> str2, System.ReadOnlySpan<char> str3) { throw null; }
-        public static System.String Concat(System.String str0, System.String str1) { throw null; }
-        public static System.String Concat(System.String str0, System.String str1, System.String str2) { throw null; }
-        public static System.String Concat(System.String str0, System.String str1, System.String str2, System.String str3) { throw null; }
+        public static System.String Concat(System.String? str0, System.String? str1) { throw null; }
+        public static System.String Concat(System.String? str0, System.String? str1, System.String? str2) { throw null; }
+        public static System.String Concat(System.String? str0, System.String? str1, System.String? str2, System.String? str3) { throw null; }
         public static System.String Concat(params string[] values) { throw null; }
         public static System.String Concat<T>(System.Collections.Generic.IEnumerable<T> values) { throw null; }
         public bool Contains(char value) { throw null; }
@@ -2349,21 +2350,22 @@ namespace System
         public static System.String Create<TState>(int length, TState state, System.Buffers.SpanAction<char, TState> action) { throw null; }
         public bool EndsWith(char value) { throw null; }
         public bool EndsWith(System.String value) { throw null; }
-        public bool EndsWith(System.String value, bool ignoreCase, System.Globalization.CultureInfo culture) { throw null; }
+        public bool EndsWith(System.String value, bool ignoreCase, System.Globalization.CultureInfo? culture) { throw null; }
         public bool EndsWith(System.String value, System.StringComparison comparisonType) { throw null; }
         public System.Text.StringRuneEnumerator EnumerateRunes() { throw null; }
         public override bool Equals(object obj) { throw null; }
+        /*public bool Equals(System.String? value) { throw null; }*/
         public bool Equals(System.String value) { throw null; }
-        public static bool Equals(System.String a, System.String b) { throw null; }
-        public static bool Equals(System.String a, System.String b, System.StringComparison comparisonType) { throw null; }
-        public bool Equals(System.String value, System.StringComparison comparisonType) { throw null; }
-        public static System.String Format(System.IFormatProvider provider, System.String format, object arg0) { throw null; }
-        public static System.String Format(System.IFormatProvider provider, System.String format, object arg0, object arg1) { throw null; }
-        public static System.String Format(System.IFormatProvider provider, System.String format, object arg0, object arg1, object arg2) { throw null; }
-        public static System.String Format(System.IFormatProvider provider, System.String format, params object[] args) { throw null; }
-        public static System.String Format(System.String format, object arg0) { throw null; }
-        public static System.String Format(System.String format, object arg0, object arg1) { throw null; }
-        public static System.String Format(System.String format, object arg0, object arg1, object arg2) { throw null; }
+        public static bool Equals(System.String? a, System.String? b) { throw null; }
+        public static bool Equals(System.String? a, System.String? b, System.StringComparison comparisonType) { throw null; }
+        public bool Equals(System.String? value, System.StringComparison comparisonType) { throw null; }
+        public static System.String Format(System.IFormatProvider? provider, System.String format, object? arg0) { throw null; }
+        public static System.String Format(System.IFormatProvider? provider, System.String format, object? arg0, object? arg1) { throw null; }
+        public static System.String Format(System.IFormatProvider? provider, System.String format, object? arg0, object? arg1, object? arg2) { throw null; }
+        public static System.String Format(System.IFormatProvider? provider, System.String format, params object[] args) { throw null; }
+        public static System.String Format(System.String format, object? arg0) { throw null; }
+        public static System.String Format(System.String format, object? arg0, object? arg1) { throw null; }
+        public static System.String Format(System.String format, object? arg0, object? arg1, object? arg2) { throw null; }
         public static System.String Format(System.String format, params object[] args) { throw null; }
         public System.CharEnumerator GetEnumerator() { throw null; }
         public override int GetHashCode() { throw null; }
@@ -2386,20 +2388,20 @@ namespace System
         public int IndexOfAny(char[] anyOf, int startIndex, int count) { throw null; }
         public System.String Insert(int startIndex, System.String value) { throw null; }
         public static System.String Intern(System.String str) { throw null; }
-        public static System.String IsInterned(System.String str) { throw null; }
+        public static System.String? IsInterned(System.String str) { throw null; }
         public bool IsNormalized() { throw null; }
         public bool IsNormalized(System.Text.NormalizationForm normalizationForm) { throw null; }
-        public static bool IsNullOrEmpty(System.String value) { throw null; }
-        public static bool IsNullOrWhiteSpace(System.String value) { throw null; }
+        public static bool IsNullOrEmpty(System.String? value) { throw null; }
+        public static bool IsNullOrWhiteSpace(System.String? value) { throw null; }
         public static System.String Join(char separator, params object[] values) { throw null; }
         public static System.String Join(char separator, params string[] value) { throw null; }
         public static System.String Join(char separator, string[] value, int startIndex, int count) { throw null; }
-        public static System.String Join(System.String separator, System.Collections.Generic.IEnumerable<string> values) { throw null; }
-        public static System.String Join(System.String separator, params object[] values) { throw null; }
-        public static System.String Join(System.String separator, params string[] value) { throw null; }
-        public static System.String Join(System.String separator, string[] value, int startIndex, int count) { throw null; }
+        public static System.String Join(System.String? separator, System.Collections.Generic.IEnumerable<string> values) { throw null; }
+        public static System.String Join(System.String? separator, params object[] values) { throw null; }
+        public static System.String Join(System.String? separator, params string[] value) { throw null; }
+        public static System.String Join(System.String? separator, string[] value, int startIndex, int count) { throw null; }
         public static System.String Join<T>(char separator, System.Collections.Generic.IEnumerable<T> values) { throw null; }
-        public static System.String Join<T>(System.String separator, System.Collections.Generic.IEnumerable<T> values) { throw null; }
+        public static System.String Join<T>(System.String? separator, System.Collections.Generic.IEnumerable<T> values) { throw null; }
         public int LastIndexOf(char value) { throw null; }
         public int LastIndexOf(char value, int startIndex) { throw null; }
         public int LastIndexOf(char value, int startIndex, int count) { throw null; }
@@ -2424,22 +2426,22 @@ namespace System
         public System.String Remove(int startIndex) { throw null; }
         public System.String Remove(int startIndex, int count) { throw null; }
         public System.String Replace(char oldChar, char newChar) { throw null; }
-        public System.String Replace(System.String oldValue, System.String newValue) { throw null; }
+        public System.String Replace(System.String oldValue, System.String? newValue) { throw null; }
         public System.String Replace(System.String oldValue, System.String newValue, bool ignoreCase, System.Globalization.CultureInfo culture) { throw null; }
         public System.String Replace(System.String oldValue, System.String newValue, System.StringComparison comparisonType) { throw null; }
         public string[] Split(char separator, int count, System.StringSplitOptions options = System.StringSplitOptions.None) { throw null; }
         public string[] Split(char separator, System.StringSplitOptions options = System.StringSplitOptions.None) { throw null; }
-        public string[] Split(params char[] separator) { throw null; }
-        public string[] Split(char[] separator, int count) { throw null; }
-        public string[] Split(char[] separator, int count, System.StringSplitOptions options) { throw null; }
-        public string[] Split(char[] separator, System.StringSplitOptions options) { throw null; }
+        public string[] Split(params char[]? separator) { throw null; }
+        public string[] Split(char[]? separator, int count) { throw null; }
+        public string[] Split(char[]? separator, int count, System.StringSplitOptions options) { throw null; }
+        public string[] Split(char[]? separator, System.StringSplitOptions options) { throw null; }
         public string[] Split(System.String separator, int count, System.StringSplitOptions options = System.StringSplitOptions.None) { throw null; }
         public string[] Split(System.String separator, System.StringSplitOptions options = System.StringSplitOptions.None) { throw null; }
-        public string[] Split(string[] separator, int count, System.StringSplitOptions options) { throw null; }
-        public string[] Split(string[] separator, System.StringSplitOptions options) { throw null; }
+        public string[] Split(string[]? separator, int count, System.StringSplitOptions options) { throw null; }
+        public string[] Split(string[]? separator, System.StringSplitOptions options) { throw null; }
         public bool StartsWith(char value) { throw null; }
         public bool StartsWith(System.String value) { throw null; }
-        public bool StartsWith(System.String value, bool ignoreCase, System.Globalization.CultureInfo culture) { throw null; }
+        public bool StartsWith(System.String value, bool ignoreCase, System.Globalization.CultureInfo? culture) { throw null; }
         public bool StartsWith(System.String value, System.StringComparison comparisonType) { throw null; }
         public System.String Substring(System.Index startIndex) { throw null; }
         public System.String Substring(int startIndex) { throw null; }
@@ -2458,6 +2460,7 @@ namespace System
         long System.IConvertible.ToInt64(System.IFormatProvider provider) { throw null; }
         sbyte System.IConvertible.ToSByte(System.IFormatProvider provider) { throw null; }
         float System.IConvertible.ToSingle(System.IFormatProvider provider) { throw null; }
+        /*object System.IConvertible.ToType(System.Type type, System.IFormatProvider? provider) { throw null; }*/
         object System.IConvertible.ToType(System.Type type, System.IFormatProvider provider) { throw null; }
         ushort System.IConvertible.ToUInt16(System.IFormatProvider provider) { throw null; }
         uint System.IConvertible.ToUInt32(System.IFormatProvider provider) { throw null; }
@@ -2474,14 +2477,15 @@ namespace System
         public System.String ToUpperInvariant() { throw null; }
         public System.String Trim() { throw null; }
         public System.String Trim(char trimChar) { throw null; }
-        public System.String Trim(params char[] trimChars) { throw null; }
+        public System.String Trim(params char[]? trimChars) { throw null; }
         public System.String TrimEnd() { throw null; }
         public System.String TrimEnd(char trimChar) { throw null; }
-        public System.String TrimEnd(params char[] trimChars) { throw null; }
+        public System.String TrimEnd(params char[]? trimChars) { throw null; }
         public System.String TrimStart() { throw null; }
         public System.String TrimStart(char trimChar) { throw null; }
-        public System.String TrimStart(params char[] trimChars) { throw null; }
+        public System.String TrimStart(params char[]? trimChars) { throw null; }
     }
+#pragma warning disable nullable
     public enum StringComparison
     {
         CurrentCulture = 0,
@@ -8331,3 +8335,4 @@ namespace System.Threading.Tasks.Sources
         Succeeded = 1,
     }
 }
+#pragma warning enable nullable

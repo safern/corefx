@@ -9,6 +9,7 @@
     <!-- Default interfaces are not officially supported in netcoreapp yet -->
     <DefineConstants Condition="'$(IsPrerelease)' == 'true' and '$(TargetGroup)' == 'netcoreapp'">$(DefineConstants);FEATURE_DEFAULT_INTERFACES</DefineConstants>
     <Configurations>netcoreapp-Debug;netcoreapp-Release;netcoreappaot-Debug;netcoreappaot-Release;uap-Debug;uap-Release</Configurations>
+    <NullableContextOptions>enable</NullableContextOptions>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="System.Runtime.cs" />
