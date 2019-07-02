@@ -7,6 +7,7 @@
       <DocsLayoutRoot>$(ArtifactsDir)\docslayout\</DocsLayoutRoot>
       <OobLayoutDir>$(DocsLayoutRoot)extensions\</OobLayoutDir>
       <InboxLayoutDir>$(DocsLayoutRoot)microsoft.netcore.app\</InboxLayoutDir>
+      <EnableProjectRestore>true</EnableProjectRestore>
     </PropertyGroup>
     <ItemGroup>
       <Exclusions Include="$(NetcoreappRefDir)dotnet-*.dll" />
@@ -16,7 +17,7 @@
       <NetcoreappRefs Include="$(NetcoreappRefDir)*.dll" Exclude="@(Exclusions)" />
       <InboxRefs Include="$(InboxRefsDir)*.dll" />
 
-      <_frameworkPackages Include="Microsoft.WindowsDesktop.App" Version="3.0.0-preview-27325-3" />
+      <_frameworkPackages Include="Microsoft.WindowsDesktop.App" Version="3.0.0-preview7-27901-06" />
 
       <!-- External assemblies we represent as part of the framework. I.e, The Microsoft.Windows.Compatibility
       package depends on WCF and we layout those as part of the Platform Extensions or OOB packages we don't built
