@@ -1,0 +1,140 @@
+<Project Sdk="Microsoft.NET.Sdk" InitialTargets="_setupReferences">
+    <PropertyGroup>
+      <TargetFramework Condition="'$(TargetFramework)' == ''">netcoreapp3.0</TargetFramework>
+
+      <NetcoreappRefDir>$(ArtifactsBinDir)\ref\netcoreapp\</NetcoreappRefDir>
+      <InboxRefsDir>$(ArtifactsBinDir)\ref\microsoft.netcore.app\</InboxRefsDir>
+      <DocsLayoutRoot>$(ArtifactsDir)\docslayout\</DocsLayoutRoot>
+      <OobLayoutDir>$(DocsLayoutRoot)extensions\</OobLayoutDir>
+      <FrameworksLayoutDir>$(DocsLayoutRoot)frameworks\</FrameworksLayoutDir>
+      <InboxLayoutDir>$(FrameworksLayoutDir)microsoft.netcore.app\</InboxLayoutDir>
+      <EnableProjectRestore>true</EnableProjectRestore>
+      <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
+      <SkipDeriveTargetFrameworks>true</SkipDeriveTargetFrameworks>
+      <DisableImplicitFrameworkReferences>false</DisableImplicitFrameworkReferences>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Exclusions Include="$(NetcoreappRefDir)dotnet-*.dll" />
+      <Exclusions Include="$(NetcoreappRefDir)CoreFX*.dll" />
+      <Exclusions Include="$(NetcoreappRefDir)System.Net.Http.Rtc.dll" />
+      <Exclusions Include="$(NetcoreappRefDir)*Experimental*" />
+      <Exclusions Include="$(NetcoreappRefDir)System.Numerics.Tensors.dll" />
+
+      <NetcoreappRefs Include="$(NetcoreappRefDir)*.dll" Exclude="@(Exclusions)" />
+      <InboxRefs Include="$(InboxRefsDir)*.dll" />
+
+      <_frameworkPackages Include="Microsoft.WindowsDesktop.App"
+                          Version="3.0.0-preview8-28405-07"
+                          DependsOnFrameworks=""
+                          AsKnownFrameworkReference="false" />
+      <_frameworkPackages Include="Microsoft.NETCore.App.Ref"
+                          AsKnownFrameworkReference="true"
+                          Version="3.0.0-preview8-28405-07"
+                          FrameworkName="Microsoft.NETCore.App" />
+
+      <!-- External assemblies we represent as part of the framework. I.e, The Microsoft.Windows.Compatibility
+      package depends on WCF and we layout those as part of the Platform Extensions or OOB packages we don't built
+      anymore in this branch -->
+      <_externalPackages Include="System.ServiceModel.Duplex" Version="4.5.3" />
+      <_externalPackages Include="System.ServiceModel.Http" Version="4.5.3" />
+      <_externalPackages Include="System.ServiceModel.NetTcp" Version="4.5.3" />
+      <_externalPackages Include="System.ServiceModel.Primitives" Version="4.5.3" />
+      <_externalPackages Include="System.ServiceModel.Security" Version="4.5.3" />
+
+      <PackageReference Include="@(_externalPackages)" />
+    </ItemGroup>
+
+    <Target Name="CoreCompile" />
+
+    <Target Name="_setupReferences">
+      <ItemGroup>
+        <!-- Remove all implicit framework packages, we only want the above package references -->
+        <PackageReference Remove="@(PackageReference)" Condition="'%(PackageReference.IsImplicitlyDefined)' == 'true'" />
+
+        <_knownFrameworkReferenceToInclude Include="%(_frameworkPackages.FrameworkName)"
+                                                       TargetingPackVersion="%(_frameworkPackages.Version)"
+                                                       Condition="'%(_frameworkPackages.AsKnownFrameworkReference)' == 'true'" />
+        
+        <_knownFrameworkReferenceToRemove Include="@(KnownFrameworkReference)" Exclude="@(_knownFrameworkReferenceToInclude)" />
+
+        <KnownFrameworkReference Remove="@(_knownFrameworkReferenceToRemove)" />
+        <KnownFrameworkReference Update="%(_knownFrameworkReferenceToInclude.Identity)"
+                                 TargetingPackVersion="%(_knownFrameworkReferenceToInclude.TargetingPackVersion)" />
+
+        <PackageReference Include="%(_frameworkPackages.Identity)"
+                          Version="%(_frameworkPackages.Version)"
+                          Condition="'%(_frameworkPackages.AsKnownFrameworkReference)' != 'true'"/>   
+      </ItemGroup>
+    </Target>
+
+    <Target Name="RunRestoreDuringBuild"
+          DependsOnTargets="Restore"
+          BeforeTargets="ResolvePackageAssets" />
+
+    <Target Name="_copyExternalPackages" AfterTargets="CoreCompile">
+      <PropertyGroup>
+        <_externalPackagesProperty>@(_externalPackages)</_externalPackagesProperty>
+      </PropertyGroup>
+      <ItemGroup>
+       <_externalReferencePath Include="@(ReferencePath)" Condition="$(_externalPackagesProperty.Contains('%(ReferencePath.NugetPackageId)'))" />
+      </ItemGroup>
+
+      <Copy
+        SourceFiles="@(_externalReferencePath)"
+        DestinationFolder="$(OobLayoutDir)"
+        OverwriteReadOnlyFiles="false" />
+    </Target>
+
+    <Target Name="_copyFrameworkAssemblies"
+            Inputs="%(_frameworkPackages.Identity)"
+            Outputs="unused"
+            AfterTargets="CoreCompile">
+      <PropertyGroup>
+       <_frameworkPackagesProperty>%(_frameworkPackages.Identity)</_frameworkPackagesProperty>
+       <_frameworkReferenceDependsOnProperty>%(_frameworkPackages.DependsOnFrameworks)</_frameworkReferenceDependsOnProperty>
+       <_layoutDirName>%(_frameworkPackages.Identity)</_layoutDirName>
+       <_layoutDir>$(FrameworksLayoutDir)$(_layoutDirName.ToLower())</_layoutDir>
+      </PropertyGroup>
+
+      <ItemGroup>
+        <_referencePathToFileName Include="@(Reference -> '%(FileName)')"  Condition="$(_frameworkPackagesProperty.Contains('%(Reference.NugetPackageId)'))">
+          <OriginalIdentity>%(Identity)</OriginalIdentity>
+        </_referencePathToFileName>
+        <_referencePathDependsOnFramework Include="@(Reference -> '%(FileName)')"
+          Condition="$(_frameworkReferenceDependsOnProperty.Contains('%(Reference.NugetPackageId)'))"
+          Exclude="@(_referencePathToFileName)">
+          <OriginalIdentity>%(Identity)</OriginalIdentity>
+        </_referencePathDependsOnFramework>
+
+        <_referencePathToCopy Include="@(_referencePathToFileName);@(_referencePathDependsOnFramework)" />
+      </ItemGroup>
+
+      <Message Importance="High" Text="%(_referencePathToCopy.OriginalIdentity)" />
+
+     <MakeDir Directories="$(_layoutDir)" />
+      <Copy
+        SourceFiles="%(_referencePathToCopy.OriginalIdentity)"
+        DestinationFolder="$(_layoutDir)"
+        OverwriteReadOnlyFiles="false" />
+    </Target>
+
+    <Target Name="_createExtensionsLayout" AfterTargets="CoreCompile">
+      <ItemGroup>
+        <_netcoreappRefsToFileName Include="@(NetcoreappRefs -> '%(FileName)')">
+          <OriginalIdentity>%(Identity)</OriginalIdentity>
+        </_netcoreappRefsToFileName>
+
+        <!-- Remove inbox references from full set of built netcoreapp refs to get OOB layout -->
+        <_netcoreappRefsToFileName Remove="@(InboxRefs -> '%(FileName)')" />
+      </ItemGroup>
+
+      <MakeDir Directories="$(OobLayoutDir)" />
+      <Copy
+        SourceFiles="@(_netcoreappRefsToFileName -> '%(OriginalIdentity)')"
+        DestinationFolder="$(OobLayoutDir)" 
+        OverwriteReadOnlyFiles="true" />
+    </Target>
+
+    <Target Name="CreateManifestResourceNames" />
+</Project>
