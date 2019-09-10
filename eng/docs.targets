@@ -4,14 +4,14 @@
 
       <NetcoreappRefDir>$(ArtifactsBinDir)\ref\netcoreapp\</NetcoreappRefDir>
       <InboxRefsDir>$(ArtifactsBinDir)\ref\microsoft.netcore.app\</InboxRefsDir>
-      <DocsLayoutRoot>$(ArtifactsDir)\docslayout\</DocsLayoutRoot>
+      <DocsLayoutRoot>$(ArtifactsDir)\docslayout\$(TargetFramework)\</DocsLayoutRoot>
       <OobLayoutDir>$(DocsLayoutRoot)extensions\</OobLayoutDir>
       <FrameworksLayoutDir>$(DocsLayoutRoot)frameworks\</FrameworksLayoutDir>
-      <InboxLayoutDir>$(FrameworksLayoutDir)microsoft.netcore.app\</InboxLayoutDir>
       <EnableProjectRestore>true</EnableProjectRestore>
       <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
       <SkipDeriveTargetFrameworks>true</SkipDeriveTargetFrameworks>
       <DisableImplicitFrameworkReferences>false</DisableImplicitFrameworkReferences>
+      <WcfPackageVersion>4.6.0</WcfPackageVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,23 +24,40 @@
       <NetcoreappRefs Include="$(NetcoreappRefDir)*.dll" Exclude="@(Exclusions)" />
       <InboxRefs Include="$(InboxRefsDir)*.dll" />
 
-      <_frameworkPackages Include="Microsoft.WindowsDesktop.App"
-                          Version="3.0.0-preview8-28405-07"
+      <_frameworkPackages Include="Microsoft.WindowsDesktop.App.Ref"
+                          Version="3.0.0"
                           DependsOnFrameworks=""
-                          AsKnownFrameworkReference="false" />
+                          FrameworkName="Microsoft.WindowsDesktop.App"
+                          AsKnownFrameworkReference="true"
+                          IncludeFrameworkReference="true"
+                          TargetFramework="netcoreapp3.0" />
       <_frameworkPackages Include="Microsoft.NETCore.App.Ref"
                           AsKnownFrameworkReference="true"
-                          Version="3.0.0-preview8-28405-07"
+                          Version="3.0.0"
+                          IncludeFrameworkReference="false"
                           FrameworkName="Microsoft.NETCore.App" />
+      <_frameworkPackages Include="Microsoft.AspNetCore.App.Ref"
+                          Version="3.0.0"
+                          AsKnownFrameworkReference="true"
+                          FrameworkName="Microsoft.AspNetCore.App"
+                          DependsOnFrameworks=""
+                          IncludeFrameworkReference="true"
+                          TargetFramework="netcoreapp3.0" />
+      <_frameworkPackages Include="NETStandard.Library.Ref"
+                          Version="2.1"
+                          AsKnownFrameworkReference="true"
+                          FrameworkName="NETStandard.Library"
+                          DependsOnFrameworks=""
+                          TargetFramework="netstandard2.1" />
 
       <!-- External assemblies we represent as part of the framework. I.e, The Microsoft.Windows.Compatibility
       package depends on WCF and we layout those as part of the Platform Extensions or OOB packages we don't built
       anymore in this branch -->
-      <_externalPackages Include="System.ServiceModel.Duplex" Version="4.5.3" />
-      <_externalPackages Include="System.ServiceModel.Http" Version="4.5.3" />
-      <_externalPackages Include="System.ServiceModel.NetTcp" Version="4.5.3" />
-      <_externalPackages Include="System.ServiceModel.Primitives" Version="4.5.3" />
-      <_externalPackages Include="System.ServiceModel.Security" Version="4.5.3" />
+      <_externalPackages Include="System.ServiceModel.Duplex" Version="$(WcfPackageVersion)" />
+      <_externalPackages Include="System.ServiceModel.Http" Version="$(WcfPackageVersion)" />
+      <_externalPackages Include="System.ServiceModel.NetTcp" Version="$(WcfPackageVersion)" />
+      <_externalPackages Include="System.ServiceModel.Primitives" Version="$(WcfPackageVersion)" />
+      <_externalPackages Include="System.ServiceModel.Security" Version="$(WcfPackageVersion)" />
 
       <PackageReference Include="@(_externalPackages)" />
     </ItemGroup>
@@ -53,18 +70,23 @@
         <PackageReference Remove="@(PackageReference)" Condition="'%(PackageReference.IsImplicitlyDefined)' == 'true'" />
 
         <_knownFrameworkReferenceToInclude Include="%(_frameworkPackages.FrameworkName)"
-                                                       TargetingPackVersion="%(_frameworkPackages.Version)"
-                                                       Condition="'%(_frameworkPackages.AsKnownFrameworkReference)' == 'true'" />
+                                                       Version="%(_frameworkPackages.Version)"
+                                                       IncludeFrameworkReference="%(_frameworkPackages.IncludeFrameworkReference)"
+                                                       Condition="'%(_frameworkPackages.AsKnownFrameworkReference)' == 'true'"
+                                                       TargetFramework="%(_frameworkPackages.TargetFramework)" />
         
         <_knownFrameworkReferenceToRemove Include="@(KnownFrameworkReference)" Exclude="@(_knownFrameworkReferenceToInclude)" />
 
         <KnownFrameworkReference Remove="@(_knownFrameworkReferenceToRemove)" />
-        <KnownFrameworkReference Update="%(_knownFrameworkReferenceToInclude.Identity)"
-                                 TargetingPackVersion="%(_knownFrameworkReferenceToInclude.TargetingPackVersion)" />
+        <KnownFrameworkReference Condition="'@(_knownFrameworkReferenceToInclude)' == '@(KnownFrameworkReference)' and '%(Identity)' != ''">
+          <TargetingPackVersion>@(_knownFrameworkReferenceToInclude -> '%(Version)')</TargetingPackVersion>
+        </KnownFrameworkReference>
+
+        <FrameworkReference Include="@(_knownFrameworkReferenceToInclude)" Condition="'%(_knownFrameworkReferenceToInclude.IncludeFrameworkReference)' == 'true' and '%(_knownFrameworkReferenceToInclude.TargetFramework)' == '$(TargetFramework)'" IsImplicitlyDefined="true" Pack="false" PrivateAssets="All" />
 
         <PackageReference Include="%(_frameworkPackages.Identity)"
                           Version="%(_frameworkPackages.Version)"
-                          Condition="'%(_frameworkPackages.AsKnownFrameworkReference)' != 'true'"/>   
+                          Condition="'%(_frameworkPackages.AsKnownFrameworkReference)' != 'true' and '%(_frameworkPackages.TargetFramework)' == '$(TargetFramework)'"/>
       </ItemGroup>
     </Target>
 
@@ -93,7 +115,8 @@
       <PropertyGroup>
        <_frameworkPackagesProperty>%(_frameworkPackages.Identity)</_frameworkPackagesProperty>
        <_frameworkReferenceDependsOnProperty>%(_frameworkPackages.DependsOnFrameworks)</_frameworkReferenceDependsOnProperty>
-       <_layoutDirName>%(_frameworkPackages.Identity)</_layoutDirName>
+       <_layoutDirName Condition="'%(_frameworkPackages.DirName)' == ''">%(_frameworkPackages.Identity)</_layoutDirName>
+       <_layoutDirName Condition="'%(_frameworkPackages.DirName)' != ''">%(_frameworkPackages.DirName)</_layoutDirName>
        <_layoutDir>$(FrameworksLayoutDir)$(_layoutDirName.ToLower())</_layoutDir>
       </PropertyGroup>
 
